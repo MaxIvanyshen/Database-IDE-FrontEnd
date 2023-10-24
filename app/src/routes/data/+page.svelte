@@ -27,11 +27,20 @@
             })
     }
     
-    async function createForm(): Promise<void> {
+    async function loadForm(): Promise<void> {
         let schema = await fetch(config.url + "/" + db + "/schema").then(resp => resp.json());
         formParams = Object.keys(schema);
+        let newForm: boolean = true;
         for(let i = 0; i < formParams.length; i++) {
-            formValues.push("");
+            if(formValues[i] != "")
+                newForm = false;
+        }
+        for(let i = 0; i < formParams.length; i++) {
+            if(newForm)
+                formValues.push("");
+            else {
+                formValues[i] = "";
+            }
         }
     }
 </script>
@@ -41,7 +50,7 @@
 <main>
     <div>
         <div class="db_select">
-            <select name="" id="" bind:value={db} >
+            <select name="" id="" bind:value={db} on:change={loadForm}>
                 {#each config.databases as database}
                     <option value="{database}">{database}</option>
                 {/each}
@@ -58,7 +67,7 @@
                 {/each}               
             </ul>
         </div>
-        <button on:click={createForm}>Create Form</button>            
+        <button on:click={loadForm}>Create Form</button>            
         <div class="form">
             {#each formParams as param, index}
                 <div class="param">
