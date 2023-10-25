@@ -21,10 +21,14 @@
         })
             .then(async (resp) => {
                 data = await resp.json();
-
-                params = Object.keys(data[0]);
+                console.log(await data[0]);
+                params = await Object.keys(data[0]);
                 console.log(data);
             })
+            
+        for(let i = 0; i < formParams.length; i++) {
+            delete form[formParams[i]];
+        }
     }
     
     async function loadForm(): Promise<void> {
