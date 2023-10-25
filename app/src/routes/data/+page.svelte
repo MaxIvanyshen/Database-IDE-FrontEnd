@@ -3,13 +3,17 @@
     let db = "postgres";
     let data: any = [];
     let params: any = [];
-    let formValues: any = [];
-    let formParams: any = []; 
+    let findFormValues: any = [];
+    let findFormParams: any = []; 
+    let insertFormParams: any = []; 
+    let insertFormValues: any = []; 
     let form: any = {};
+    let schema: any = null;
+    let insertionObject: any = {}; 
     async function find(): Promise<void> {
-        for(let i = 0; i < formParams.length; i++) {
-            if(formValues[i] != "")
-                form[formParams[i]] = formValues[i];
+        for(let i = 0; i < findFormParams.length; i++) {
+            if(findFormValues[i] != "")
+                form[findFormParams[i]] = findFormValues[i];
         }
         await fetch(config.url + "/" + db + "/find_many", {
             method: "POST",
@@ -24,28 +28,57 @@
                 console.log(await data[0]);
                 params = await Object.keys(data[0]);
                 console.log(data);
-            })
+            });
             
-        for(let i = 0; i < formParams.length; i++) {
-            delete form[formParams[i]];
+        for(let i = 0; i < findFormParams.length; i++) {
+            delete form[findFormParams[i]];
         }
     }
     
-    async function loadForm(): Promise<void> {
-        let schema = await fetch(config.url + "/" + db + "/schema").then(resp => resp.json());
-        formParams = Object.keys(schema);
+    async function loadFindForm(): Promise<void> {
+        schema = await fetch(config.url + "/" + db + "/schema").then(resp => resp.json());
+        findFormParams = Object.keys(schema);
         let newForm: boolean = true;
-        for(let i = 0; i < formParams.length; i++) {
-            if(formValues[i] != "")
+        for(let i = 0; i < findFormParams.length; i++) {
+            if(findFormValues[i] != "")
                 newForm = false;
         }
-        for(let i = 0; i < formParams.length; i++) {
+        for(let i = 0; i < findFormParams.length; i++) {
             if(newForm)
-                formValues.push("");
+                findFormValues.push("");
             else {
-                formValues[i] = "";
+                findFormValues[i] = "";
             }
         }
+    }
+    
+    async function loadInsertForm(): Promise<void> {
+        if(schema == null) {
+            schema = await fetch(config.url + "/" + db + "/schema").then(resp => resp.json());
+            insertFormParams = Object.keys(schema);
+        }
+        for(let i = 0; i < findFormParams.length; i++) {
+            insertFormValues[i] = "";
+        }
+
+    }
+    
+    async function insert(): Promise<void> {
+        for(let i = 0; i < insertFormParams.length; i++) {
+            insertionObject[insertFormParams[i]] = insertFormValues[i];
+        }     
+
+        await fetch(config.url + "/" + db + "/write", {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(insertionObject),
+        })
+            .then(async (resp) => {
+                console.log(await resp.json());
+            });
     }
 </script>
 
@@ -54,7 +87,7 @@
 <main>
     <div>
         <div class="db_select">
-            <select name="" id="" bind:value={db} on:change={loadForm}>
+            <select name="" id="" bind:value={db} on:change={loadFindForm}>
                 {#each config.databases as database}
                     <option value="{database}">{database}</option>
                 {/each}
@@ -71,15 +104,25 @@
                 {/each}               
             </ul>
         </div>
-        <button on:click={loadForm}>Create Form</button>            
+        <button on:click={loadFindForm}>Create Form</button>            
         <div class="form">
-            {#each formParams as param, index}
+            {#each findFormParams as param, index}
                 <div class="param">
                     <label for="param">{param}</label>
-                    <input type="text" name="" id="param" bind:value={formValues[index]}> 
+                    <input type="text" name="" id="param" bind:value={findFormValues[index]}> 
                 </div>
             {/each}
         </div>
         <button on:click = {find}>find</button>
+        <button on:click={loadInsertForm}>Add data</button>
+        <div class="form">
+            {#each insertFormParams as param, index}
+                <div class="param">
+                    <label for="param">{param}</label>
+                    <input type="text" name="" id="param" bind:value={insertFormValues[index]}> 
+                </div>
+            {/each}
+        </div>
+        <button on:click={insert}>insert</button>
     </div>
 </main>
