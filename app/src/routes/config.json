@@ -1,4 +1,4 @@
 {
     "url": "http://localhost:8000",
-    "databases": ["postgres", "mongo", "mysql"]
+    "databases": [{"value": "postgres", "label": "PostgreSQL"}, {"value": "mongo", "label": "MongoDB"}, {"value": "mysql", "label": "MySQL"}]
 }

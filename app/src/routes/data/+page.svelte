@@ -1,6 +1,9 @@
 <script lang="ts">
+    import Select from 'svelte-select';
     import * as config from "../config.json";
-    let db = "postgres";
+    import "../app.css";
+    let db: any = null;
+
     let data: any = [];
     let params: any = [];
     let findFormValues: any = [];
@@ -81,48 +84,62 @@
             });
     }
 </script>
-
-<h1>Welcome to Data Editing page</h1>
-
+<h1 class="text-3xl font-bold underline">Welcome to Data Editing page</h1>
 <main>
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+    
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 light:bg-gray-700 dark:text-gray-400">
+          <tr>
+            {#each params as param}
+                <th scope="col" class="px-6 py-3">
+                    {param}
+                </th>
+            {/each}
+          </tr>
+        </thead>
+        <tbody>
+        {#each data as el}
+          <tr class="bg-white border-b light:bg-gray-800 dark:border-gray-700">
+            
+            {#each params as param}
+               <td class="px-6 py-3">{el[param]}</td> 
+            {/each}
+          </tr>  
+        {/each}
+          
+        </tbody>
+      </table>
+
     <div>
-        <div class="db_select">
-            <select name="" id="" bind:value={db} on:change={loadFindForm}>
-                {#each config.databases as database}
-                    <option value="{database}">{database}</option>
-                {/each}
-            </select>
+        <div class="container db_select">
+            <Select items={config.databases} bind:justValue={db} on:change={loadFindForm}/>
         </div>
-        <div class="data">
-            <ul>
-                {#each data as el}
-                    <li>
-                        {#each params as key}
-                            <p>{el[key]}</p>
-                        {/each}
-                    </li>
-                {/each}               
-            </ul>
-        </div>
-        <button on:click={loadFindForm}>Create Form</button>            
+        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click = {loadFindForm}>Create Form</button>
         <div class="form">
+                <div class="mb-4 container">
             {#each findFormParams as param, index}
-                <div class="param">
-                    <label for="param">{param}</label>
-                    <input type="text" name="" id="param" bind:value={findFormValues[index]}> 
-                </div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" style="text-align: center;" for="username">
+                      {param}
+                    </label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" bind:value={findFormValues[index]}>
             {/each}
+
+                  </div>
         </div>
-        <button on:click = {find}>find</button>
-        <button on:click={loadInsertForm}>Add data</button>
+        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click = {find}>Find</button>
+        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click={loadInsertForm}>Add data</button>
         <div class="form">
+        <div class="mb-4 container">
             {#each insertFormParams as param, index}
-                <div class="param">
-                    <label for="param">{param}</label>
-                    <input type="text" name="" id="param" bind:value={insertFormValues[index]}> 
-                </div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" style="text-align: center;" for="username">
+                      {param}
+                    </label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" bind:value={insertFormValues[index]}>
             {/each}
+
+                  </div>
         </div>
-        <button on:click={insert}>insert</button>
+               
+        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click={insert}>Insert</button>
     </div>
 </main>
