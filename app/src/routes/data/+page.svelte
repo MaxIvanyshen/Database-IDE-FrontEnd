@@ -3,7 +3,6 @@
     import * as config from "../config.json";
     import "../app.css";
     let db: any = null;
-
     let data: any = [];
     let params: any = [];
     let findFormValues: any = [];
@@ -58,10 +57,10 @@
     async function loadInsertForm(): Promise<void> {
         if(schema == null) {
             schema = await fetch(config.url + "/" + db + "/schema").then(resp => resp.json());
-            insertFormParams = Object.keys(schema);
         }
-        for(let i = 0; i < findFormParams.length; i++) {
-            insertFormValues[i] = "";
+            insertFormParams = Object.keys(schema);
+        for(let i = 0; i < insertFormParams.length; i++) {
+            insertFormValues.push("");
         }
 
     }
@@ -82,6 +81,11 @@
             .then(async (resp) => {
                 console.log(await resp.json());
             });
+    }
+    
+    async function loadForms(): Promise<void> {
+        await loadFindForm(); 
+        await loadInsertForm();
     }
 </script>
 <h1 class="text-3xl font-bold underline">Welcome to Data Editing page</h1>
@@ -112,22 +116,25 @@
 
     <div>
         <div class="container db_select">
-            <Select items={config.databases} bind:justValue={db} on:change={loadFindForm}/>
-        </div>
-        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click = {loadFindForm}>Create Form</button>
-        <div class="form">
-                <div class="mb-4 container">
-            {#each findFormParams as param, index}
-                    <label class="block text-gray-700 text-sm font-bold mb-2" style="text-align: center;" for="username">
-                      {param}
-                    </label>
-                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" bind:value={findFormValues[index]}>
-            {/each}
+            <Select items={config.databases} bind:justValue={db}/>
 
-                  </div>
         </div>
-        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click = {find}>Find</button>
-        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click={loadInsertForm}>Add data</button>
+        <div class="flex flex-row">
+            <div class="container">
+                <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click = {loadFindForm}>Create Form</button>
+                <div class="form">
+                    <div class="mb-4 container">
+                        {#each findFormParams as param, index}
+                            <label class="block text-gray-700 text-sm font-bold mb-2" style="text-align: center;" for="username">
+                              {param}
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" bind:value={findFormValues[index]}>
+                        {/each}
+                    </div>
+ <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click = {find}>Find</button>
+                </div>
+            </div>
+
         <div class="form">
         <div class="mb-4 container">
             {#each insertFormParams as param, index}
@@ -138,8 +145,10 @@
             {/each}
 
                   </div>
+                <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click={loadInsertForm}>Add data</button>
+        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click={insert}>Insert</button>
         </div>
                
-        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" on:click={insert}>Insert</button>
-    </div>
+            </div>
+            </div>
 </main>
